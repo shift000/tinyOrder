@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TinyOrder - Einstellungen</title>
+    <!-- SweetAlert2 CSS -->
+    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/index.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="fhead">
+            .:[ TinyOrder - Einstellungen ]:.
+        </div>
+        <div class="fbody">
+            <table class="entry-table">
+                <thead>
+                    <tr>
+                        <th>Einstellung</th>
+                        <th>Wert</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in entries %}
+                    <tr>
+                        <td>{{ entry.name }}</td>
+                        <td>{{ entry.bestellung }}</td>
+                        <td>{{ entry.anmerkung }}</td>
+                        <td><a href="#" class="removeRow">Entfernen</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div id="error-message" style="color: red; margin-top: 20px;">
+            {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                    {% set first_message = messages[0] %}
+                    {{ first_message[1] }}
+                {% endif %}
+            {% endwith %}
+        </div>
+        <div class="control">
+            <a href="{{ url_for('save_config') }}" class="btn">=|[ Zurück ]|=</a>
+        </div>
+        <div class="ffoot">
+            &copy; 2024 shift000 | Angemeldet als {{ username }}
+        </div>
+    </div>
+    <script>
+    </script>
+</body>
+</html>
