@@ -15,14 +15,16 @@ def initialize_db():
     db = TinyDB(DB_PATH)
     # Hier werden die Tabellen erstellt, wenn sie nicht existieren
     
-    tables = ['user', 'orders']
+    tables = ['user', 'orders', 'items']
     # user : uid, name, passwd, rank
     # orders : oid, f_uid, order, extra, date
+    # items : iid, name
     
     for t in tables:
         db.table(t).all()
         
     initialize_user()
+    initialize_items()
     db.close()
 
 def add_user(alias, name, passwd, rank):
@@ -45,6 +47,8 @@ def add_user(alias, name, passwd, rank):
     })
     
     db.close()
+    
+    
 
 def get_user_by_id(uid):
     """Ruft einen Benutzer basierend auf der UID ab."""
@@ -112,6 +116,8 @@ def get_orders():
     # Abrufen aller Bestellungen
     orders = orders_table.all()
     
+    print(orders)
+    
     db.close()
     return orders if orders else None
 
@@ -136,6 +142,28 @@ def get_orders_by_user_and_date(f_uid, search_date):
     
     return orders if orders else None
 
+def get_orders_by_today():
+    """
+    Ruft alle Bestellungen eines bestimmten Benutzers (f_uid) für das heutige Datum ab.
+    
+    :param f_uid: Die Benutzer-ID (fremder Schlüssel)
+    :return: Eine Liste von Bestellungen, die die Bedingungen erfüllen
+    """
+    db = TinyDB(DB_PATH)
+    orders_table = db.table('orders')
+
+    # Heutiges Datum im Format '%d.%m.%Y'
+    today_date = datetime.now().strftime('%d.%m.%Y')
+    
+    # Query-Objekt für die Suche
+    OrderQuery = Query()
+    
+    # Suche nach Bestellungen mit passender f_uid und dem heutigen Datum (nur der Datumsteil)
+    orders = orders_table.search(OrderQuery.date.matches(f'^{today_date}'))
+    
+    db.close()
+    
+    return orders if orders else None
 
 def delete_order(oid):
     """Löscht eine Bestellung basierend auf der OID."""
@@ -171,9 +199,64 @@ def debug_print_all():
             print(order)
     else:
         print("No orders found.")
+        
+    # Inhalte der 'orders'-Tabelle ausgeben
+    items_table = db.table('items')
+    items = items_table.all()
+    print("\nItems Table Contents:")
+    if items:
+        for item in items:
+            print(item)
+    else:
+        print("No items found.")
     
     db.close()
 
+def add_item(name):
+    """Fügt einen neuen Benutzer hinzu."""
+    db = TinyDB(DB_PATH)
+    items_table = db.table('items')
+
+    iid = 1
+    if len(items_table) > 0:
+        items = items_table.all()
+        iid = int(max([item['iid'] for item in items])) + 1
+        
+    items_table.insert({
+        'iid': iid,
+        'name': name,
+    })
+    
+    db.close()
+    
+def get_item(name):
+    db = TinyDB(DB_PATH)
+    items_table = db.table('items')
+    
+    # Query-Objekt für die Suche
+    OrderQuery = Query()
+    
+    # Suche nach Bestellungen mit passender f_uid und dem heutigen Datum (nur der Datumsteil)
+    item = items_table.search(OrderQuery.name == name)
+    
+    db.close()
+    
+    return item[0] if item else None
+
+def get_item_name(id):
+    db = TinyDB(DB_PATH)
+    items_table = db.table('items')
+    
+    # Query-Objekt für die Suche
+    OrderQuery = Query()
+    
+    # Suche nach Bestellungen mit passender f_uid und dem heutigen Datum (nur der Datumsteil)
+    item = items_table.search(OrderQuery.iid == int(id))
+    
+    db.close()
+    
+    return item[0] if item else None
+    
 def initialize_user():
     users = {
         'admin@admin.test': {'password': 'admin', 'name': 'Administrator', 'rank': 0},
@@ -185,6 +268,14 @@ def initialize_user():
     if not get_user(list(users.keys())[0]):
         for key, item in users.items():
             add_user(key, item["name"], item["password"], item["rank"])
+
+def initialize_items():
+    items = ["Laugenweck", "Spitzweck"]
+    
+    for item in items:
+        if not get_item(item):
+            add_item(item)
+        
         
         
         

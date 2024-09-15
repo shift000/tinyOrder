@@ -17,6 +17,9 @@
         <form class="order-form" method="POST" action="{{ url_for('make_order') }}">
         <div class="fbody">
             <div class="frame">
+                {% if notification %}
+                    <p>INFO : {{ notification }}</p>
+                {% endif %}
                 <div class="tables-container">
                 <table class="waren-tabelle" id="warenTabelle">
                     <thead>
@@ -33,9 +36,9 @@
                             </td>
                             <td>
                                 <select name="ware[]" style="width: 100%;">
-                                    <option value="apfel">Apfel</option>
-                                    <option value="banane">Banane</option>
-                                    <option value="orange">Orange</option>
+                                    {% for entry in entries %}
+                                    <option value="{{ entry.id }}">{{ entry.name }}</option>
+                                    {% endfor %}
                                 </select>
                             </td>
                             <td><a href="#" class="removeRow">Entfernen</a></td>

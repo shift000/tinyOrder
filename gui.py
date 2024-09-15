@@ -3,7 +3,7 @@ from io import StringIO
 from flask import Flask, render_template, request, redirect, url_for, jsonify, Response, flash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_session import Session
-from db_funcs import debug_print_all, add_user, get_user, get_user_by_id, add_order, get_order, get_orders, delete_order
+from db_funcs import debug_print_all, add_user, get_user, get_user_by_id, add_order, get_order, get_orders, get_orders_by_today, delete_order, get_item_name
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'  # Wähle einen sicheren Schlüssel
@@ -42,6 +42,7 @@ def index():
     else:
         temp = []
         for o in orders:
+            print(o["order"])
             temp.append({
                 "id": o["oid"],
                 "name": get_user_by_id(o["f_uid"])["name"],
@@ -76,7 +77,14 @@ def logout():
 @app.route('/order')
 @login_required
 def order():
-    return render_template('order.html', username=get_current_user()['name'])
+    notification = "Bitte bis 11 Uhr bestellen!"
+    
+    entries = [
+        {"id": 1, "name": "Laugenweck"},
+        {"id": 2, "name": "Spitzweck"}
+    ]
+    
+    return render_template('order.html', username=get_current_user()['name'], notification=notification, entries=entries)
 
 @app.route('/config')
 @login_required
@@ -103,10 +111,13 @@ def make_order():
         anzahl = request.form.getlist('anzahl[]')
         ware = request.form.getlist('ware[]')
         extra = request.form['extra']
+        
+        print(">>", ware, anzahl, extra, "<<")
     
+        # TODO : Zusammenzählen
         order = ""
         for i, a in enumerate(anzahl):
-            line = f"{a}x {ware[i]}, "
+            line = f"{a}x {get_item_name(ware[i])['name']}, "
             order += line
         order = order[:-2]
     
@@ -145,6 +156,7 @@ def remove_order():
 
 @app.route('/export_list')
 def export_list():
+    print(get_orders_by_today())
     """entries = get_time_entries()
     output = StringIO()
     writer = csv.writer(output)
@@ -188,4 +200,4 @@ def get_entry():
     return jsonify(entry_info)
 
 def start_gui():
-    app.run(debug=True)
+    app.run(host="0.0.0.0", debug=True)
