@@ -55,7 +55,7 @@ def get_user_by_id(uid):
     user = user_table.search(UserQuery.uid == uid)
     
     db.close()
-    return user if user else None
+    return user[0] if user else None
 
 def get_user(alias):
     """Ruft einen Benutzer basierend auf der UID ab."""
@@ -66,27 +66,30 @@ def get_user(alias):
     user = user_table.search(UserQuery.alias == alias)
     
     db.close()
-    return user if user else None
+    return user[0] if user else None
 
 def add_order(f_uid, order, extra):
     """Fügt eine neue Bestellung hinzu."""
     db = TinyDB(DB_PATH)
     orders_table = db.table('orders')
     
-    oid = 1
-    if len(orders_table) > 0:
-        orders = orders_table.all()
-        uid = int(max([order['oid'] for order in orders])) + 1
+    if not get_orders_by_user_and_date(f_uid, datetime.now().strftime('%d.%m.%Y')):
+        oid = 1
+        if len(orders_table) > 0:
+            orders = orders_table.all()
+            oid = int(max([order['oid'] for order in orders])) + 1
+            
+        orders_table.insert({
+            'oid': oid,
+            'f_uid': f_uid,  # Fremdschlüssel zur Benutzer-ID
+            'order': order,
+            'extra': extra,
+            'date': datetime.now().strftime('%d.%m.%Y - %H:%M:%S')
+        })
         
-    orders_table.insert({
-        'oid': oid,
-        'f_uid': f_uid,  # Fremdschlüssel zur Benutzer-ID
-        'order': order,
-        'extra': extra,
-        'date': datetime.now().strftime('%d.%m.%Y - %H:%M:%S')
-    })
-    
-    db.close()
+        db.close()
+        return {"sucess":True, "id": oid}
+    return {"sucess":False}
 
 def get_order(oid):
     """Ruft eine Bestellung basierend auf der OID ab."""
@@ -94,10 +97,12 @@ def get_order(oid):
     orders_table = db.table('orders')
     
     OrderQuery = Query()
+    
+    oid = int(oid)
     order = orders_table.search(OrderQuery.oid == oid)
     
     db.close()
-    return order if order else None
+    return order[0] if order else None
 
 def get_orders():
     """Ruft alle Bestellungen aus der 'orders'-Tabelle ab."""
@@ -110,6 +115,27 @@ def get_orders():
     db.close()
     return orders if orders else None
 
+def get_orders_by_user_and_date(f_uid, search_date):
+    """
+    Ruft alle Bestellungen eines bestimmten Benutzers (f_uid) zu einem bestimmten Datum ab.
+    
+    :param f_uid: Die Benutzer-ID (fremder Schlüssel)
+    :param search_date: Das gesuchte Datum im Format '%d.%m.%Y' (z.B. '15.09.2024')
+    :return: Eine Liste von Bestellungen, die die Bedingungen erfüllen
+    """
+    db = TinyDB(DB_PATH)
+    orders_table = db.table('orders')
+    
+    # Query-Objekt für die Suche
+    OrderQuery = Query()
+    
+    # Suche nach Bestellungen mit passender f_uid und Datum (nur der Datumsteil)
+    orders = orders_table.search((OrderQuery.f_uid == f_uid) & (OrderQuery.date.matches(f'^{search_date}')))
+    
+    db.close()
+    
+    return orders if orders else None
+
 
 def delete_order(oid):
     """Löscht eine Bestellung basierend auf der OID."""
@@ -120,6 +146,7 @@ def delete_order(oid):
     orders_table.remove(OrderQuery.oid == oid)
     
     db.close()
+    return 1
     
 def debug_print_all():
     """Gibt den gesamten Inhalt der Tabellen 'user' und 'orders' für Debug-Zwecke aus."""

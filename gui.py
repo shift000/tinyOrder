@@ -19,10 +19,12 @@ class User(UserMixin):
         self.id = id
 
 def get_current_user():
-    return get_user(current_user.id)[0]
+    return get_user(current_user.id)
 
 is_admin = lambda : get_current_user()['rank'] == 0
-is_owner = lambda id : get_current_user()['uid'] == id
+is_owner = lambda id : int(get_current_user()['uid']) == int(id)
+curr_user_name = lambda : get_current_user()['name']
+curr_user_uid = lambda : get_current_user()['uid']
         
 @login_manager.user_loader
 def load_user(user_id):
@@ -32,11 +34,8 @@ def load_user(user_id):
 @app.route('/')
 @login_required
 def index():
-    #debug_print_all()
-    entries = [
-        {'name': 'Max Mustermann', 'bestellung': '2x Laugenweck, 1x Körnerweck', 'anmerkung': 'Hallo bitte mit Soße'},
-        {'name': 'Erika Mustermann', 'bestellung': '3x Brötchen', 'anmerkung': 'Ohne Butter'}
-    ]
+    debug_print_all()
+    
     orders = get_orders()
     if not orders:
         orders = []
@@ -44,7 +43,8 @@ def index():
         temp = []
         for o in orders:
             temp.append({
-                "name": get_user_by_id(o["f_uid"])[0]["name"],
+                "id": o["oid"],
+                "name": get_user_by_id(o["f_uid"])["name"],
                 "order": o["order"],
                 "extra": o["extra"]
             })
@@ -59,7 +59,7 @@ def login():
         password = request.form['password']
         
         userdata = get_user(username)
-        if userdata and userdata[0]["passwd"] == password:
+        if userdata and userdata["passwd"] == password:
             user = User(username)
             login_user(user)
             return redirect(url_for('index'))
@@ -96,22 +96,28 @@ def configure_items():
     else:
         return render_template('configure_items.html', username=get_current_user()['name'])
 
-@app.route('/make_order')
+@app.route('/make_order', methods=['GET', 'POST'])
 @login_required
 def make_order():
-    user = get_current_user()['uid']
-    order = ""
-    extra = "xx"
+    if request.method == 'POST':
+        anzahl = request.form.getlist('anzahl[]')
+        ware = request.form.getlist('ware[]')
+        extra = request.form['extra']
     
-    anzahl = request.form.getlist('anzahl[]')
-    ware = request.form.getlist('ware[]')
-    extra = request.form.get('extra')
+        order = ""
+        for i, a in enumerate(anzahl):
+            line = f"{a}x {ware[i]}, "
+            order += line
+        order = order[:-2]
     
-    print(anzahl, ware, extra)
-    
-    add_order(user, order, extra)
-    flash('Bestellung erfolgreich', 'success')
-    return redirect(url_for('index'))
+        ret = add_order(curr_user_uid(), order, extra)
+        if ret["sucess"]:
+            flash(f'Bestellung {ret["id"]} erfolgreich', 'success')
+            return redirect(url_for('index'))
+        else:
+            flash(f'Bestellung fehlgeschlagen. Es existiert bereits eine für heute!', 'failure')
+            return redirect(url_for('index'))
+    return render_template('order.html')
 
 @app.route('/save_config')
 @login_required
@@ -121,27 +127,20 @@ def save_config():
 @app.route('/remove_order', methods=['POST'])
 @login_required
 def remove_order():
-    data = request.get_json()
-    print(">> ", data)
-    
-    if is_owner(0) or is_admin():
+    if request.method == 'POST':
+        data = request.get_json()
+        order = get_order(data["id"])
         
-        #row_id = data.get('id')
-        
-        # Hier solltest du Logik hinzufügen, um die Bestellung basierend auf der ID zu entfernen.
-        # Zum Beispiel:
-        # success = remove_order_from_database(row_id)
-        
-        # Dummy-Response zur Veranschaulichung
-        success = True  # Setze dies auf False, wenn die Löschung fehlschlägt
-        
-        if success:
-            return jsonify({'success': True})
+        if is_owner(order["f_uid"]) or is_admin():
+            if delete_order(order["oid"]):
+                flash('Bestellung entfernt', 'sucess')
+                return jsonify({'success': True})
+            else:
+                return jsonify({'success': False, 'error': 'Fehler beim Entfernen der Bestellung'}), 666
         else:
-            return jsonify({'success': False, 'error': 'Fehler beim Entfernen der Bestellung'}), 666
-    else:
-        flash('Keine Berechtigung Bestellungen zu entfernen', 'error')
-        return jsonify({'success': False, 'error': 'Fehler beim Entfernen der Bestellung'}), 403
+            flash('Keine Berechtigung Bestellungen zu entfernen', 'error')
+            return jsonify({'success': False, 'error': 'Fehler beim Entfernen der Bestellung'}), 403
+    return jsonify({'success': False, 'error': 'Fehler..'}), 666
         
 
 @app.route('/export_list')

@@ -19,9 +19,9 @@
     
                 // HTML für die neue Zeile
                 newRow.innerHTML = 
-                    "<td><input type='number' name='anzahl' min='1' max='3' value='1' placeholder='Anzahl' style='width: 100%;'></td>" +
+                    "<td><input type='number' name='anzahl[]' min='1' max='3' value='1' placeholder='Anzahl' style='width: 100%;'></td>" +
                     "<td>" +
-                    "<select name='ware' style='width: 100%;'>" +
+                    "<select name='ware[]' style='width: 100%;'>" +
                     "<option value='apfel'>Apfel</option>" +
                     "<option value='banane'>Banane</option>" +
                     "<option value='orange'>Orange</option>" +

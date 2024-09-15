@@ -36,7 +36,7 @@
                 </thead>
                 <tbody>
                     {% for entry in entries %}
-                    <tr>
+                    <tr data-id="{{ entry.id }}">
                         <td>{{ entry.name }}</td>
                         <td>{{ entry.order }}</td>
                         <td>{{ entry.extra }}</td>
@@ -71,13 +71,20 @@
             row.querySelector('.removeRow').addEventListener('click', function(event) {
                 event.preventDefault(); // Verhindert das Standard-Verhalten des Links
                 const row = this.closest('tr'); // Finde die nächste Tabellenzeile
+                const id = row.dataset.id; // Hole die ID aus dem data-id Attribut
+    
+                if (!id) {
+                    console.error('Keine ID für diese Zeile gefunden.');
+                    return; // Abbrechen, wenn keine ID vorhanden ist
+                }
+
                 // Optional: Senden einer Fetch-Anfrage, um den Server über die Löschung zu informieren
                 fetch('/remove_order', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ id: row.dataset.id }) // ID oder andere Daten zum Identifizieren der Zeile
+                    body: JSON.stringify({ id: id }) // Senden der ID zum Entfernen der Zeile
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -102,6 +109,7 @@
         document.querySelectorAll('.entry-table .removeRow').forEach(function(element) {
             addRemoveFunctionality(element.closest('tr'));
         });
+
     </script>
 </body>
 </html>
