@@ -57,8 +57,10 @@
         <div class="control">
             <a href="{{ url_for('order') }}" class="btn btn_green">=|[ Essen bestellen ]|=</a>
             <a href="{{ url_for('export_list') }}" class="btn">=|[ Einkaufszettel drucken ]|=</a>
-            <a href="{{ url_for('configure_items') }}" class="btn">=|[ Auswahl konfigurieren ]|=</a>
-            <a href="{{ url_for('config') }}" class="btn">=|[ Einstellungen ]|=</a>
+			{% if rank is not none and rank == 0 %}
+				<a href="{{ url_for('configure_items') }}" class="btn">=|[ Auswahl konfigurieren ]|=</a>
+				<a href="{{ url_for('config') }}" class="btn">=|[ Einstellungen ]|=</a>
+			{% endif %}
             <a href="{{ url_for('logout') }}" class="btn">=|[ Logout ]|=</a>
         </div>
         <div class="ffoot">

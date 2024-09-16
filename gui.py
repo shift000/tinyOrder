@@ -42,7 +42,6 @@ def index():
     else:
         temp = []
         for o in orders:
-            #print(o["order"])
             temp.append({
                 "id": o["oid"],
                 "name": get_user_by_id(o["f_uid"])["name"],
@@ -51,7 +50,7 @@ def index():
             })
         orders = temp
         
-    return render_template('index.html', entries=orders, username=get_current_user()['name'])
+    return render_template('index.html', entries=orders, username=get_current_user()['name'], rank=get_current_user()['rank'])
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -103,8 +102,6 @@ def order():
     notification = "Bitte bis 11 Uhr bestellen!"
     
     entries = get_items()
-    print(entries)
-    
     return render_template('order.html', username=get_current_user()['name'], notification=notification, entries=entries)
 
 @app.route('/config')
