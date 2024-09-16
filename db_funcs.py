@@ -277,8 +277,13 @@ def get_item_name(iid):
     
 def initialize_user():
     users = {
-        'admin@admin.test': {'password': 'admin', 'name': 'Administrator', 'rank': 0},
-        'test@test.test': {'password': 'test', 'name': 'Testuser', 'rank': 2},
+        'admin@xx.de': {'password': 'admin', 'name': 'Administrator', 'rank': 0},
+        'test@xx.de': {'password': 'test', 'name': 'Testuser', 'rank': 2},
+        'zusatz01@xx.de': {'password': 'z01', 'name': 'Zusatz01', 'rank': 2},
+        'zusatz02@xx.de': {'password': 'z02', 'name': 'Zusatz02', 'rank': 2},
+        'zusatz03@xx.de': {'password': 'z03', 'name': 'Zusatz03', 'rank': 2},
+        'zusatz04@xx.de': {'password': 'z04', 'name': 'Zusatz04', 'rank': 2},
+        'zusatz05@xx.de': {'password': 'z05', 'name': 'Zusatz05', 'rank': 2},
     }
     
     if not get_user_by_email(list(users.keys())[0]):

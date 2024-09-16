@@ -34,6 +34,8 @@ def load_user(user_id):
 @app.route('/')
 @login_required
 def index():
+    if not get_current_user():
+        return render_template('login.html', error="Bitte anmelden!")
     orders = get_orders()
     if not orders:
         orders = []
@@ -175,6 +177,9 @@ def remove_order():
 def export_list():
     entries = get_orders_by_today()
 
+    if not entries:
+        flash(f'Export fehlgeschlagen. Es existiert noch keine Bestellung!', 'failure')
+        return redirect(url_for('index'))
     # Gesamtübersicht der Bestellungen
     total_orders = {}
     user_orders = {}

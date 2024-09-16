@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style/loginbox.css') }}">
 </head>
 <body>
-    <form id="loginbox" method="POST">
+    <form id="loginbox" action="/login" method="POST">
         <h2>TinyOrder - Login</h2>
         {% if error %}
             <p class="error">{{ error }}</p>
