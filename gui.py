@@ -3,7 +3,7 @@ from io import StringIO
 from flask import Flask, render_template, request, redirect, url_for, jsonify, Response, flash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_session import Session
-from db_funcs import debug_print_all, add_user, get_user, get_user_by_id, add_order, get_order, get_orders, get_orders_by_today, delete_order, get_item_name
+from db_funcs import debug_print_all, add_user, get_user, get_user_by_id, add_order, get_order, get_orders, get_orders_by_today, delete_order, get_item_name, get_items
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'  # Wähle einen sicheren Schlüssel
@@ -25,6 +25,7 @@ is_admin = lambda : get_current_user()['rank'] == 0
 is_owner = lambda id : int(get_current_user()['uid']) == int(id)
 curr_user_name = lambda : get_current_user()['name']
 curr_user_uid = lambda : get_current_user()['uid']
+user_by_id = lambda uid : get_user_by_id(uid)
         
 @login_manager.user_loader
 def load_user(user_id):
@@ -34,7 +35,7 @@ def load_user(user_id):
 @app.route('/')
 @login_required
 def index():
-    debug_print_all()
+    #debug_print_all()
     
     orders = get_orders()
     if not orders:
@@ -42,7 +43,7 @@ def index():
     else:
         temp = []
         for o in orders:
-            print(o["order"])
+            #print(o["order"])
             temp.append({
                 "id": o["oid"],
                 "name": get_user_by_id(o["f_uid"])["name"],
@@ -79,10 +80,8 @@ def logout():
 def order():
     notification = "Bitte bis 11 Uhr bestellen!"
     
-    entries = [
-        {"id": 1, "name": "Laugenweck"},
-        {"id": 2, "name": "Spitzweck"}
-    ]
+    entries = get_items()
+    print(entries)
     
     return render_template('order.html', username=get_current_user()['name'], notification=notification, entries=entries)
 
@@ -111,8 +110,6 @@ def make_order():
         anzahl = request.form.getlist('anzahl[]')
         ware = request.form.getlist('ware[]')
         extra = request.form['extra']
-        
-        print(">>", ware, anzahl, extra, "<<")
     
         # TODO : Zusammenzählen
         order = ""
@@ -156,34 +153,56 @@ def remove_order():
 
 @app.route('/export_list')
 def export_list():
-    print(get_orders_by_today())
-    """entries = get_time_entries()
-    output = StringIO()
-    writer = csv.writer(output)
-    writer.writerow(['Aufgabe', 'Projekt', 'Dauer', 'Startzeit', 'Endzeit', 'Datum'])
+    entries = get_orders_by_today()
 
-    filename = ''
-    
+    # Gesamtübersicht der Bestellungen
+    total_orders = {}
+    user_orders = {}
+
+    # Verarbeite alle Bestellungen
     for entry in entries:
-        writer.writerow([
-            entry.get('task'),
-            entry.get('project'),
-            entry.get('duration'),
-            entry.get('start_time'),
-            entry.get('end_time'),
-            entry.get('date')
-        ])
-        if not filename:
-            filename = entry.get('date')
-            filename = f'tasklist-{filename.replace(".", "-")}.csv'
-    
+        order_items = entry.get('order').split(', ')
+        
+        # Summiere die Bestellungen für die Gesamtübersicht
+        for item in order_items:
+            count, item_name = item.split('x ')
+            count = int(count.strip())
+            total_orders[item_name] = total_orders.get(item_name, 0) + count
+        
+        # Bestellungen nach Benutzer (f_uid) gruppieren
+        f_uid = entry.get('f_uid')
+        if f_uid not in user_orders:
+            user_orders[f_uid] = []
+        user_orders[f_uid].append(entry.get('order'))
+
+    # Erstelle den Inhalt der Textdatei
+    output = StringIO()
+
+    # Schreibe die Gesamtübersicht in die Datei
+    output.write("=== Gesamtbestellungen ===\n")
+    for item_name, count in total_orders.items():
+        output.write(f"{count}x {item_name}\n")
+
+    # Schreibe die Bestellungen pro Benutzer in die Datei
+    output.write("\n\n=== Bestellungen nach Benutzer ===\n")
+    for f_uid, orders in user_orders.items():
+        output.write(f"\nBenutzer {user_by_id(f_uid)['name']}:\n")
+        for order in orders:
+            output.write(f"- {order}\n")
+
+    # Erstelle den Dateinamen basierend auf dem Datum der ersten Bestellung
+    filename = entries[0].get('date').split(' ')[0].replace('.', '-') if entries else 'bestellungen'
+    filename = f'bestellungen-{filename}.txt'
+
+    # Setze den Stream-Zeiger auf den Anfang der Datei
     output.seek(0)
+
+    # Gebe die Datei als Download zurück
     return Response(
-        output,
-        mimetype="text/csv",
+        output.getvalue(),
+        mimetype="text/plain",
         headers={"Content-Disposition": f"attachment;filename={filename}"}
-    )"""
-    return(index())
+    )
 
 @app.route('/get_entry', methods=['GET'])
 def get_entry():
@@ -200,4 +219,4 @@ def get_entry():
     return jsonify(entry_info)
 
 def start_gui():
-    app.run(host="0.0.0.0", debug=True)
+    app.run(port=5001, debug=True)

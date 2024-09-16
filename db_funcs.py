@@ -243,7 +243,20 @@ def get_item(name):
     
     return item[0] if item else None
 
-def get_item_name(id):
+def get_items():
+    """Ruft alle Einträge aus der 'items'-Tabelle ab."""
+    db = TinyDB(DB_PATH)
+    items_table = db.table('items')
+    
+    # Abrufen aller Bestellungen
+    items = items_table.all()
+    
+    print(items)
+    
+    db.close()
+    return items if items else None
+
+def get_item_name(iid):
     db = TinyDB(DB_PATH)
     items_table = db.table('items')
     
@@ -251,7 +264,7 @@ def get_item_name(id):
     OrderQuery = Query()
     
     # Suche nach Bestellungen mit passender f_uid und dem heutigen Datum (nur der Datumsteil)
-    item = items_table.search(OrderQuery.iid == int(id))
+    item = items_table.search(OrderQuery.iid == int(iid))
     
     db.close()
     
@@ -262,7 +275,6 @@ def initialize_user():
         'admin@admin.test': {'password': 'admin', 'name': 'Administrator', 'rank': 0},
         'test@test.test': {'password': 'test', 'name': 'Testuser', 'rank': 2},
         'markus.schaetzle@bpex.de': {'password': 'password', 'name': 'Markus Schätzle', 'rank': 1},
-        
     }
     
     if not get_user(list(users.keys())[0]):
@@ -270,7 +282,8 @@ def initialize_user():
             add_user(key, item["name"], item["password"], item["rank"])
 
 def initialize_items():
-    items = ["Laugenweck", "Spitzweck"]
+    items = ["Brezel", "Vollkornbrötchen", "Laugenecke", "Laugenweck", "Laugenstange", "Spitzweck", "Baguettebrötchen", "Miniwaldi", "Körnerbrötchen", "Kürbiskernbrötchen"]
+    items.sort()
     
     for item in items:
         if not get_item(item):

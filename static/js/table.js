@@ -62,7 +62,17 @@ document.getElementById('addRow').addEventListener('click', function(event) {
 function addRemoveFunctionality(row) {
     row.querySelector('.removeRow').addEventListener('click', function(event) {
         event.preventDefault(); // Verhindert das Standard-Verhalten des Links
-        row.remove(); // Entfernt die Zeile
+        
+		var rowCount = document.getElementById('warenTabelle').getElementsByTagName('tbody')[0].getElementsByTagName('tr').length;
+
+        if (rowCount > 1) { // Überprüfen, ob mehr als eine Zeile vorhanden ist
+            row.remove(); // Entfernt die Zeile
+            errorMessageDiv.style.display = 'none'; // Versteckt die Fehlermeldung, falls sie zuvor angezeigt wurde
+        } else {
+            // Zeige die Fehlermeldung an, dass die letzte Zeile nicht entfernt werden kann
+            errorMessageDiv.textContent = "Letzte Zeile kann nicht entfernt werden!";
+            errorMessageDiv.style.display = 'block'; // Fehlernachricht sichtbar machen
+        }
     });
 }
 
