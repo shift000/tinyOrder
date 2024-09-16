@@ -3,10 +3,10 @@ from io import StringIO
 from flask import Flask, render_template, request, redirect, url_for, jsonify, Response, flash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_session import Session
-from db_funcs import debug_print_all, add_user, get_user, get_user_by_id, add_order, get_order, get_orders, get_orders_by_today, delete_order, get_item_name, get_items
+from db_funcs import debug_print_all, add_user, get_user_by_email, get_user_by_id, add_order, get_order, get_orders, get_orders_by_today, delete_order, get_item_name, get_items, hash_password, verify_password
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_secret_key'  # Wähle einen sicheren Schlüssel
+app.config['SECRET_KEY'] = 'fetch_data_secret'
 app.config['SESSION_TYPE'] = 'filesystem'  # Oder eine andere Methode zur Speicherung der Sessions
 Session(app)
 
@@ -19,7 +19,7 @@ class User(UserMixin):
         self.id = id
 
 def get_current_user():
-    return get_user(current_user.id)
+    return get_user_by_email(current_user.id)
 
 is_admin = lambda : get_current_user()['rank'] == 0
 is_owner = lambda id : int(get_current_user()['uid']) == int(id)
@@ -31,12 +31,9 @@ user_by_id = lambda uid : get_user_by_id(uid)
 def load_user(user_id):
     return User(user_id)
 
-
 @app.route('/')
 @login_required
 def index():
-    #debug_print_all()
-    
     orders = get_orders()
     if not orders:
         orders = []
@@ -60,8 +57,8 @@ def login():
         username = request.form['username']
         password = request.form['password']
         
-        userdata = get_user(username)
-        if userdata and userdata["passwd"] == password:
+        userdata = get_user_by_email(username)
+        if userdata and verify_password(userdata["passwd"], password):
             user = User(username)
             login_user(user)
             return redirect(url_for('index'))
@@ -74,6 +71,29 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form['email']
+        name = request.form['name']
+        password = request.form['password']
+        password2 = request.form['password2']
+
+        # Überprüfen, ob die Passwörter übereinstimmen
+        if password != password2:
+            return render_template('register.html', error="Passwörter stimmen nicht überein.")
+        
+        # Überprüfen, ob die E-Mail bereits verwendet wird
+        if get_user_by_email(email):
+            return render_template('register.html', error="E-Mail ist bereits registriert.")
+        
+        # Neuen Benutzer erstellen
+        add_user(email, name, hash_password(password), rank=2) # Standard-user-Rank = 2
+        return redirect(url_for('login'))  # Nach erfolgreicher Registrierung zum Login umleiten
+
+    return render_template('register.html')
+
 
 @app.route('/order')
 @login_required

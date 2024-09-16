@@ -47,6 +47,7 @@
 }
 
 #loginbox input[type="text"],
+#loginbox input[type="email"],
 #loginbox input[type="password"] {
     width: calc(100% - 20px); /* Breite minus Padding */
     padding: 10px;
@@ -73,4 +74,11 @@
 
 #loginbox br {
     display: none; /* Entfernt die Zeilenumbrüche für bessere Kontrolle */
+}
+
+#loginbox a {
+	background: #fff;
+	color: #3c3c3c;
+}#loginbox a:hover{
+	transition: .2s;
 }

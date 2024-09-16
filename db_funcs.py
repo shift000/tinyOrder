@@ -1,6 +1,13 @@
 from tinydb import TinyDB, Query
 from datetime import datetime
 import os
+from werkzeug.security import generate_password_hash, check_password_hash
+
+def hash_password(password):
+    return generate_password_hash(password)
+    
+def verify_password(stored_password_hash, provided_password):
+    return check_password_hash(stored_password_hash, provided_password)
 
 def out(msg, title=""):
     print(f'{title}:: {msg}')
@@ -27,7 +34,7 @@ def initialize_db():
     initialize_items()
     db.close()
 
-def add_user(alias, name, passwd, rank):
+def add_user(email, name, passwd, rank):
     """Fügt einen neuen Benutzer hinzu."""
     db = TinyDB(DB_PATH)
     user_table = db.table('user')
@@ -39,7 +46,7 @@ def add_user(alias, name, passwd, rank):
         
     user_table.insert({
         'uid': uid,
-        'alias': alias,
+        'email': email,
         'name': name,
         'passwd': passwd,
         'rank': rank,
@@ -47,8 +54,6 @@ def add_user(alias, name, passwd, rank):
     })
     
     db.close()
-    
-    
 
 def get_user_by_id(uid):
     """Ruft einen Benutzer basierend auf der UID ab."""
@@ -61,13 +66,13 @@ def get_user_by_id(uid):
     db.close()
     return user[0] if user else None
 
-def get_user(alias):
+def get_user_by_email(email):
     """Ruft einen Benutzer basierend auf der UID ab."""
     db = TinyDB(DB_PATH)
     user_table = db.table('user')
     
     UserQuery = Query()
-    user = user_table.search(UserQuery.alias == alias)
+    user = user_table.search(UserQuery.email == email)
     
     db.close()
     return user[0] if user else None
@@ -274,12 +279,11 @@ def initialize_user():
     users = {
         'admin@admin.test': {'password': 'admin', 'name': 'Administrator', 'rank': 0},
         'test@test.test': {'password': 'test', 'name': 'Testuser', 'rank': 2},
-        'markus.schaetzle@bpex.de': {'password': 'password', 'name': 'Markus Schätzle', 'rank': 1},
     }
     
-    if not get_user(list(users.keys())[0]):
+    if not get_user_by_email(list(users.keys())[0]):
         for key, item in users.items():
-            add_user(key, item["name"], item["password"], item["rank"])
+            add_user(key, item["name"], hash_password(item["password"]), item["rank"])
 
 def initialize_items():
     items = ["Brezel", "Vollkornbrötchen", "Laugenecke", "Laugenweck", "Laugenstange", "Spitzweck", "Baguettebrötchen", "Miniwaldi", "Körnerbrötchen", "Kürbiskernbrötchen"]
