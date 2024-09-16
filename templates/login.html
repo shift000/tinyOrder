@@ -13,14 +13,16 @@
         <h2>TinyOrder - Login</h2>
         {% if error %}
             <p class="error">{{ error }}</p>
+		{% elif success %}
+			<p class="success">{{ success }}</p>
         {% else %}
             &nbsp;
         {% endif %}
         <label for="username">Benutzername:</label>
-        <input type="text" id="username" name="username" required>
+        <input type="text" id="username" placeholder="max.mustermann@email.de" name="username" required>
         <br>
         <label for="password">Passwort:</label>
-        <input type="password" id="password" name="password" required>
+        <input type="password" id="password" placeholder="********" name="password" required>
         <br>
 		<a href="/register">Registrieren</a>
         <button type="submit">Login</button>

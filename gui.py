@@ -71,6 +71,7 @@ def login():
 @login_required
 def logout():
     logout_user()
+    flash('Erfolgreich abgemeldet!', 'success')
     return redirect(url_for('login'))
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -138,7 +139,7 @@ def make_order():
         order = order[:-2]
     
         ret = add_order(curr_user_uid(), order, extra)
-        if ret["sucess"]:
+        if ret["success"]:
             flash(f'Bestellung {ret["id"]} erfolgreich', 'success')
             return redirect(url_for('index'))
         else:
@@ -160,7 +161,7 @@ def remove_order():
         
         if is_owner(order["f_uid"]) or is_admin():
             if delete_order(order["oid"]):
-                flash('Bestellung entfernt', 'sucess')
+                flash('Bestellung entfernt', 'success')
                 return jsonify({'success': True})
             else:
                 return jsonify({'success': False, 'error': 'Fehler beim Entfernen der Bestellung'}), 666

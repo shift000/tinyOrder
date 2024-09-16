@@ -42,8 +42,9 @@
     padding:10px;
 }.error{
     color:red;   
+}.success{
+    color:green;   
 }
-
 
 input, select{
     border-radius:0;
@@ -56,6 +57,7 @@ input, select{
     color: #000;
     font-weight: bold;
     padding:3px;
+	background: #fff;
     /*border:2px solid red;
     /*display: none; /* Standardmäßig ausblenden */
 }

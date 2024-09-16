@@ -7,6 +7,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    background: linear-gradient(135deg, rgba(51, 107, 135, 0.7) 20%, rgba(240, 244, 248, 0.7) 20%, rgba(255, 255, 255, 0.7) 40%, rgba(51, 107, 135, 0.7) 40%, rgba(51, 107, 135, 0.7) 60%, rgba(255, 255, 255, 0.7) 60%, rgba(255, 255, 255, 0.7) 80%, rgba(51, 107, 135, 0.7) 80%);
 }
 
 .container, .order-form{
@@ -21,6 +22,10 @@ body {
     justify-content: space-between;
     padding: 10px;
 }
+
+/*.container{
+	background: linear-gradient(135deg, rgba(51, 107, 135, 0.7) 20%, rgba(240, 244, 248, 0.7) 20%, rgba(255, 255, 255, 0.7) 40%, rgba(51, 107, 135, 0.7) 40%, rgba(51, 107, 135, 0.7) 60%, rgba(255, 255, 255, 0.7) 60%, rgba(255, 255, 255, 0.7) 80%, rgba(51, 107, 135, 0.7) 80%);
+}*/
 
 .fhead {
     background-color: #fff;/*#336b87;*/

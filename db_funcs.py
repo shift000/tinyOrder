@@ -97,8 +97,8 @@ def add_order(f_uid, order, extra):
         })
         
         db.close()
-        return {"sucess":True, "id": oid}
-    return {"sucess":False}
+        return {"success":True, "id": oid}
+    return {"success":False}
 
 def get_order(oid):
     """Ruft eine Bestellung basierend auf der OID ab."""
@@ -255,8 +255,6 @@ def get_items():
     
     # Abrufen aller Bestellungen
     items = items_table.all()
-    
-    print(items)
     
     db.close()
     return items if items else None
