@@ -4,10 +4,12 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify, R
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_session import Session
 from db_funcs import debug_print_all, add_user, get_user_by_email, get_user_by_id, add_order, get_order, get_orders, get_orders_by_today, delete_order, get_item_name, get_items, hash_password, verify_password
+import config as app_config
+import msal
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'fetch_data_secret'
-app.config['SESSION_TYPE'] = 'filesystem'  # Oder eine andere Methode zur Speicherung der Sessions
+app.config.from_object(app_config.Config)
+app.secret_key = app_config.secret_key
 Session(app)
 
 login_manager = LoginManager()
@@ -22,11 +24,35 @@ def get_current_user():
     return get_user_by_email(current_user.id)
 
 is_admin = lambda : get_current_user()['rank'] == 0
-is_owner = lambda id : int(get_current_user()['uid']) == int(id)
+is_owner = lambda iid : int(get_current_user()['uid']) == int(iid)
 curr_user_name = lambda : get_current_user()['name']
 curr_user_uid = lambda : get_current_user()['uid']
 user_by_id = lambda uid : get_user_by_id(uid)
+
+# === M365 als SingleSignOn ===
+def build_msal_app():
+    return msal.ConfidentialClientApplication(
+        app.config["CLIENT_ID"], authority=app.config["AUTHORITY"],
+        client_credential=app.config["CLIENT_SECRET"])
+
+
+def build_auth_url():
+    return build_msal_app().get_authorization_request_url(
+        app.config["SCOPE"],
+        redirect_uri=url_for("authorized", _external=True))
         
+@app.route(app.config["REDIRECT_PATH"])
+def authorized():
+    if request.args.get('code'):
+        result = build_msal_app().acquire_token_by_authorization_code(
+            request.args['code'],
+            scopes=app.config["SCOPE"],
+            redirect_uri=url_for("authorized", _external=True))
+        if "access_token" in result:
+            session["user"] = result.get("id_token_claims")
+    return redirect(url_for("index"))
+# ===
+
 @login_manager.user_loader
 def load_user(user_id):
     return User(user_id)
@@ -54,25 +80,36 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+    if not app_config.login_by_sso:
+        if request.method == 'POST':
+            username = request.form['username']
+            password = request.form['password']
         
-        userdata = get_user_by_email(username)
-        if userdata and verify_password(userdata["passwd"], password):
-            user = User(username)
-            login_user(user)
-            return redirect(url_for('index'))
-        return render_template('login.html', error="Falsches Passwort/Username")
-
-    return render_template('login.html')
+            userdata = get_user_by_email(username)
+            if userdata and verify_password(userdata["passwd"], password):
+                user = User(username)
+                login_user(user)
+                return redirect(url_for('index'))
+            return render_template('login.html', error="Falsches Passwort/Username")
+    
+        return render_template('login.html')
+    else:
+        return redirect(build_auth_url())
 
 @app.route('/logout')
 @login_required
 def logout():
-    logout_user()
-    flash('Erfolgreich abgemeldet!', 'success')
-    return redirect(url_for('login'))
+    if not app_config.login_by_sso:
+        logout_user()
+        flash('Erfolgreich abgemeldet!', 'success')
+        return redirect(url_for('login'))
+    else:
+        session.clear()
+        return redirect(
+            app.config["AUTHORITY"] + "/oauth2/v2.0/logout" +
+            f"?post_logout_redirect_uri={url_for('index', _external=True)}"
+        )
+    
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -196,7 +233,7 @@ def export_list():
         f_uid = entry.get('f_uid')
         if f_uid not in user_orders:
             user_orders[f_uid] = []
-        user_orders[f_uid].append(entry.get('order'))
+        user_orders[f_uid].append({"order": entry.get('order'), "extra": entry.get('extra')})
 
     # Erstelle den Inhalt der Textdatei
     output = StringIO()
@@ -208,10 +245,14 @@ def export_list():
 
     # Schreibe die Bestellungen pro Benutzer in die Datei
     output.write("\n\n=== Bestellungen nach Benutzer ===\n")
-    for f_uid, orders in user_orders.items():
+    for f_uid, data in user_orders.items():
         output.write(f"\nBenutzer {user_by_id(f_uid)['name']}:\n")
-        for order in orders:
-            output.write(f"- {order}\n")
+        data = data[0]
+        for order in data["order"].split(","):
+            output.write(f"- {order.strip()}\n")
+        if data["extra"]:
+            output.write(f'Anmerkung: {data["extra"]}\n')
+        
 
     # Erstelle den Dateinamen basierend auf dem Datum der ersten Bestellung
     filename = entries[0].get('date').split(' ')[0].replace('.', '-') if entries else 'bestellungen'

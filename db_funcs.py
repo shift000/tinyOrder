@@ -121,7 +121,7 @@ def get_orders():
     # Abrufen aller Bestellungen
     orders = orders_table.all()
     
-    print(orders)
+    #print(orders)
     
     db.close()
     return orders if orders else None
