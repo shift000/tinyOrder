@@ -1,0 +1,76 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TinyOrder - Einstellungen</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/index.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/tables-container.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="fhead">
+            TinyOrder - Einstellungen
+        </div>
+
+        <!--<form class="config-form" method="POST" action="{{ url_for('config') }}">-->
+        <div class="fbody">
+            <div class="frame">
+                <!-- Tabellencontainer -->
+                <div class="tables-container container-items">
+                        <table class="entry-table" id="itemTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name des Items</th>
+                                    <th>Aktionen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in items %}
+                                <tr>
+                                    <td>{{ item.id }}</td>
+                                    <td>
+                                        <input type="text" name="name" value="{{ item.name }}" style="width: 100%;" required>
+                                    </td>
+                                    <td>
+                                        <button type="submit" class="xxx" name="edit" value="{{ item.id }}">Ändern</button>
+                                        <button type="submit" class="xxx" name="delete" value="{{ item.id }}">Löschen</button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                <div class="tables-container">
+                        <h3>Neues Item hinzufügen</h3>
+                        <input type="text" name="name" placeholder="Name des Items" style="width: 100%;" required>
+                    </div>
+                        
+                <!-- Neues Item hinzufügen -->
+                <div id="extra_comment">
+                </div>
+            </div>
+        </div>
+        <div id="error-message">
+            {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                    {% set first_message = messages[0] %}
+                    {{ first_message[1] }}
+                {% endif %}
+            {% endwith %}
+        </div>
+        <div class="control">
+            <a href="{{ url_for('index') }}" class="btn">Zurück</a>
+            <button type="submit" name="add" class="btn">Eintrag hinzufügen</button>
+        </div>
+        <!--</form>-->
+
+        <div class="ffoot">
+            &copy; 2024 shift000 | Angemeldet als {{ username }}
+        </div>
+    </div>
+
+</body>
+</html>

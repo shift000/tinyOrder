@@ -1,31 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TinyOrder - Login</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style/index.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style/loginbox.css') }}">
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>Login</title>
+    <!-- CSS files -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tabler.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tabler-flags.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tabler-payments.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tabler-vendors.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/demo.min.css') }}">
 </head>
-<body>
-    <form id="loginbox" action="/login" method="POST">
-        <h2>TinyOrder - Login</h2>
-        {% if error %}
-            <p class="error">{{ error }}</p>
-		{% elif success %}
-			<p class="success">{{ success }}</p>
-        {% else %}
-            &nbsp;
-        {% endif %}
-        <label for="username">Benutzername:</label>
-        <input type="text" id="username" placeholder="max.mustermann@email.de" name="username" required>
-        <br>
-        <label for="password">Passwort:</label>
-        <input type="password" id="password" placeholder="********" name="password" required>
-        <br>
-		<a href="/register">Registrieren</a>
-        <button type="submit">Login</button>
-    </form>
-</body>
+  <body  class=" d-flex flex-column">
+    <script src="{{ url_for('static', filename='js/demo-theme.min.js') }}"></script>
+    <div class="page page-center">
+      <div class="container container-normal py-4">
+        <div class="row align-items-center g-4">
+          <div class="col-lg">
+            <div class="container-tight">
+              <div class="text-center mb-4">
+                <a href="." class="navbar-brand navbar-brand-autodark"><img src="{{ url_for('static', filename='svg/logo.svg') }}"></a>
+              </div>
+              <div class="card card-md">
+                <div class="card-body">
+                  <h2 class="h2 text-center mb-4">{{ login.headline }}</h2>
+                  <form action="/login" method="POST" autocomplete="off" novalidate>
+                    <div class="mb-3">
+                      <label class="form-label">{{ login.email }}</label>
+                      <input type="email" {% if error %}class="form-control is-invalid form-control"{% else %}class="form-control"{% endif %} name="email" placeholder="{{ login.email_placeholder }}" autocomplete="off">
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-label">
+                        {{ login.password }}
+                        <span class="form-label-description">
+                          <a href="./forgot">{{ login.forgot }}</a>
+                        </span>
+                      </label>
+                      <div class="input-group input-group-flat">
+                        <input type="password" {% if error %}class="form-control is-invalid form-control"{% else %}class="form-control"{% endif %} name="password" placeholder="{{ login.pass_placeholder }}"  autocomplete="off">
+                        <span class="input-group-text">
+                          <a href="#" class="link-secondary" title="Show password" data-bs-toggle="tooltip"><!-- Download SVG icon from http://tabler-icons.io/i/eye -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg>
+                          </a>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-check">
+                        <input type="checkbox" value="off" name="remember" class="form-check-input"/>
+                        <span class="form-check-label">{{ login.remember }}</span>
+                      </label>
+                      
+                    </div>
+                    <div class="form-footer">
+                      <button type="submit" class="btn btn-primary w-100">{{ login.sign_in }}</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              <div class="text-center text-muted mt-3">
+                {{ login.no_account }}<a href="./register" tabindex="-1"> {{ login.register }}</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg d-none d-lg-block">
+            <img src="{{ url_for('static', filename='svg/food.svg') }}" height="300" class="d-block mx-auto" alt="">
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Libs JS -->
+    <!-- Tabler Core -->
+    <script src="{{ url_for('static', filename='js/tabler.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/demo.min.js') }}"></script>
+  </body>
 </html>

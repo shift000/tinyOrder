@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <!-- Background circle representing the plate -->
+  <circle cx="200" cy="200" r="180" fill="#f8f9fa" stroke="#e0e0e0" stroke-width="8"/>
+
+  <!-- Inner circle for plate depth -->
+  <circle cx="200" cy="200" r="150" fill="#ffffff" stroke="#cccccc" stroke-width="4"/>
+
+  <!-- Fork design -->
+  <rect x="60" y="80" width="10" height="160" fill="#999"/>
+  <!-- Fork tines -->
+  <rect x="60" y="80" width="2" height="40" fill="#999"/>
+  <rect x="64" y="80" width="2" height="40" fill="#999"/>
+  <rect x="68" y="80" width="2" height="40" fill="#999"/>
+  <rect x="72" y="80" width="2" height="40" fill="#999"/>
+
+  <!-- Knife design -->
+  <rect x="320" y="100" width="6" height="150" fill="#999"/>
+  <!-- Knife handle -->
+  <rect x="314" y="240" width="18" height="12" fill="#666"/>
+
+  <!-- Spoon design -->
+  <!-- Spoon handle -->
+  <rect x="110" y="140" width="8" height="120" fill="#999"/>
+  <!-- Spoon head -->
+  <ellipse cx="114" cy="130" rx="20" ry="25" fill="#999"/>
+
+  <!-- Food items on plate -->
+  <!-- Bread or toast -->
+  <rect x="150" y="180" width="100" height="20" rx="10" ry="10" fill="#ffcc99" stroke="#e6b888" stroke-width="2"/>
+  <!-- Egg -->
+  <ellipse cx="190" cy="220" rx="40" ry="25" fill="#ffffcc" stroke="#ffeb99" stroke-width="2"/>
+  <circle cx="190" cy="220" r="15" fill="#ffdd57"/>
+
+  <!-- Salad or greens -->
+  <circle cx="230" cy="270" r="30" fill="#88cc88" stroke="#77bb77" stroke-width="2"/>
+  <ellipse cx="210" cy="265" rx="15" ry="8" fill="#77bb77"/>
+  <ellipse cx="250" cy="275" rx="20" ry="10" fill="#66aa66"/>
+
+  <!-- Text "Lunch Menu" -->
+  <text x="100" y="360" fill="#333" font-family="Arial" font-size="32" font-weight="bold">Lunch Menu</text>
+
+  <!-- Decorative elements around the text -->
+  <!-- Left decorative line -->
+  <line x1="50" y1="355" x2="95" y2="355" stroke="#999" stroke-width="3"/>
+  <!-- Right decorative line -->
+  <line x1="305" y1="355" x2="350" y2="355" stroke="#999" stroke-width="3"/>
+</svg>

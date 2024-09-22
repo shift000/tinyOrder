@@ -1,0 +1,82 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TinyOrder - Bestellen</title>
+    <!-- SweetAlert2 CSS -->
+    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/x_style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/x_index.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="fhead">
+            TinyOrder - Bestellen
+        </div>
+        <form class="order-form" method="POST" action="{{ url_for('make_order') }}">
+        <div class="fbody">
+            <div class="frame">
+                {% if notification %}
+                    <p>INFO : {{ notification }}</p>
+                {% endif %}
+                <div class="tables-container">
+                <table class="waren-tabelle" id="warenTabelle">
+                    <thead>
+                        <tr>
+                            <th>Anzahl</th>
+                            <th>Ware</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <input type="number" name="anzahl[]" min="1" max="3" value="1" placeholder="Anzahl" style="width: 100%;">
+                            </td>
+                            <td>
+                                <select name="ware[]" style="width: 100%;">
+                                    {% for entry in entries %}
+                                    <option value="{{ entry.iid }}">{{ entry.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td><a href="#" class="removeRow">Entfernen</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+                <div id="extra_comment">
+                    <hr/>
+                    <label for="extra">Anmerkungen</label><hr/>
+                    <textarea name="extra" id="extra" rows="4" cols="50" placeholder="Deine Anmerkungen hier.."></textarea>
+                </div>
+            </div>
+        </div>
+        <div id="error-message" style="color: red; margin-top: 20px;">
+            {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                    {% set first_message = messages[0] %}
+                    {{ first_message[1] }}
+                {% endif %}
+            {% endwith %}
+        </div>
+        <div class="control">
+            <a href="#" class="btn btn_green" id="addRow" data-error="ERR_MAX_ROWS_EXCEEDED">=|[ Zeile hinzufügen ]|=</a>
+            <a href="{{ url_for('index') }}" class="btn">=|[ Zurück ]|=</a>
+            <button type="submit" class="btn" >=|[ Bestellung abschicken ]|=</button>
+        </div>
+        </form>
+        <div class="ffoot">
+            &copy; 2024 shift000 | Angemeldet als {{ username }}
+        </div>
+        <!--<div class="fixed-div">
+            <p>Dies ist ein fixiertes Element.</p>
+            <button id="closeDiv">Schließen</button>
+        </div>-->
+    </div>
+
+    <script src="{{ url_for('static', filename='js/table.js') }}"></script>
+    <!--script src="{{ url_for('static', filename='js/alertbox.js') }}"></script-->
+</body>
+</html>

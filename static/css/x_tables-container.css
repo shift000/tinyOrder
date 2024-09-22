@@ -1,0 +1,39 @@
+
+
+.frame{
+    width:calc(100% - 4px);
+    height:100%;
+}.fbody{
+    overflow-y:scroll;
+    height:auto;
+    width:100%;
+}
+
+.container{
+    box-sizing: border-box;
+}
+
+
+.tables-container{
+    float:left;
+    width:calc(45% - 44px);
+    padding-left:20px;
+}.container-items{
+    overflow-y:scroll;
+}td{
+    padding:15px;
+}
+.config-form{
+    height: 100vh;
+}
+
+.entry-table{
+    overflow:scroll;
+}
+
+@media (max-width: 768px) {
+    .tables-container{
+        float:none;
+         width:calc(100% - 24px);
+    }
+}

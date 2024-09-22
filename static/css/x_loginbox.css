@@ -1,0 +1,85 @@
+/* Stile für das Login-Formular */
+#loginbox {
+    width: 100%;
+    max-width: 400px; /* Maximale Breite des Formulars auf größeren Bildschirmen */
+    margin: 0 auto; /* Zentriert das Formular horizontal auf größeren Bildschirmen */
+    padding: 20px;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Zentriert die Formularelemente */
+	overflow: hidden;
+}
+
+/* Desktop-Stile */
+@media (min-width: 768px) {
+    #loginbox {
+        /* Keine zusätzlichen Stile erforderlich für Desktop */
+    }
+}
+
+/* Mobile-Stile */
+@media (max-width: 767px) {
+    #loginbox {
+        max-width: 100%; /* Macht das Formular auf mobilen Geräten vollständig breit */
+        margin: 0; /* Entfernt den horizontalen Abstand */
+        border-radius: 0; /* Entfernt die abgerundeten Ecken */
+        width: 100vw; /* Setzt die Breite auf 100% der Viewport-Breite */
+        height: 100vh; /* Setzt die Höhe auf 100% der Viewport-Höhe */
+        box-shadow: none; /* Entfernt den Schatten auf mobilen Geräten */
+        padding: 20px; /* Passt das Padding an den mobilen Bildschirm an */
+    }
+
+    #loginbox h2 {
+        font-size: 1.5em; /* Verkleinert die Schriftgröße des Titels auf mobilen Geräten */
+    }
+}
+
+/* Stil für das Formular-Elemente */
+#loginbox label {
+    font-size: 1em;
+    color: #333;
+    margin-top: 10px;
+    display: block;
+    width: 100%;
+}
+
+#loginbox input[type="text"],
+#loginbox input[type="email"],
+#loginbox input[type="password"] {
+    width: calc(100% - 20px); /* Breite minus Padding */
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    background:#fff;
+}
+
+#loginbox button {
+    padding: 10px 20px;
+    font-size: 1em;
+    color: #fff;
+    background-color: #336b87;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#loginbox button:hover {
+    background-color: #285c6c;
+}
+
+#loginbox br {
+    display: none; /* Entfernt die Zeilenumbrüche für bessere Kontrolle */
+}
+
+#loginbox a {
+	background: #fff;
+	color: #3c3c3c;
+}#loginbox a:hover{
+	transition: .2s;
+}

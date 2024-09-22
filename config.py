@@ -10,5 +10,5 @@ class Config:
 
 secret_key = 'supergeheimeschluessel'
 config_secret_key = 'supergeheimeschluessel'
-login_by_sso = True
+login_by_sso = False
 

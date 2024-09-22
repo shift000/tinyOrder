@@ -1,0 +1,116 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TinyOrder - Landing</title>
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tabler.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tabler-flags.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tabler-payments.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tabler-vendors.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/demo.min.css') }}">
+    <style>
+        .error {
+            color: #000;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="fhead">
+            TinyOrder - Landing
+        </div>
+        <div class="fbody">
+            <table class="entry-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Bestellung</th>
+                        <th>Anmerkung</th>
+                        <th>Aktionen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in entries %}
+                    <tr data-id="{{ entry.id }}">
+                        <td>{{ entry.name }}</td>
+                        <td>{{ entry.order }}</td>
+                        <td>{{ entry.extra }}</td>
+                        <td><a href="#" class="removeRow">Entfernen</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div id="error-message">
+            {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                    {% set first_message = messages[0] %}
+                    {{ first_message[1] }}
+                {% endif %}
+            {% endwith %}
+        </div>
+        <div class="control">
+            <a href="{{ url_for('order') }}" class="btn btn_green">Essen bestellen</a>
+            <a href="{{ url_for('export_list') }}" class="btn">Einkaufszettel drucken</a>
+			{% if rank is not none and rank == 0 %}
+				<a href="{{ url_for('configure_items') }}" class="btn">Auswahl konfigurieren</a>
+				<a href="{{ url_for('config') }}" class="btn">Einstellungen</a>
+                <a href="{{ url_for('conf') }}" class="btn">Configs</a>
+			{% endif %}
+            <a href="{{ url_for('logout') }}" class="btn">Logout</a>
+        </div>
+        <div class="ffoot">
+             &copy; 2024 shift000 | Angemeldet als {{ username }}
+        </div>
+    </div>
+    <script>
+        // Funktion zum Hinzufügen der Entfernen-Funktionalität
+        function addRemoveFunctionality(row) {
+            row.querySelector('.removeRow').addEventListener('click', function(event) {
+                event.preventDefault(); // Verhindert das Standard-Verhalten des Links
+                const row = this.closest('tr'); // Finde die nächste Tabellenzeile
+                const id = row.dataset.id; // Hole die ID aus dem data-id Attribut
+    
+                if (!id) {
+                    console.error('Keine ID für diese Zeile gefunden.');
+                    return; // Abbrechen, wenn keine ID vorhanden ist
+                }
+
+                // Optional: Senden einer Fetch-Anfrage, um den Server über die Löschung zu informieren
+                fetch('/remove_order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: id }) // Senden der ID zum Entfernen der Zeile
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        row.remove(); // Entferne die Zeile vom DOM
+                    } else {
+                        console.error('Fehler beim Entfernen der Zeile:', data.error);
+
+                        // Wenn kein div mit der Klasse "error" existiert
+                        const errorMessageElement = document.getElementById('error-message');
+
+                        // Überprüfen, ob das Element existiert, bevor der Inhalt gesetzt wird
+                        if (errorMessageElement) {
+                            errorMessageElement.innerHTML = 'Keine Berechtigung Bestellungen zu entfernen';
+                        }
+                    }
+                }).catch(error => console.error('Fetch-Fehler:', error));
+            });
+        }
+
+        // Initiale Entfernen-Funktionalität für bereits vorhandene Zeilen hinzufügen
+        document.querySelectorAll('.entry-table .removeRow').forEach(function(element) {
+            addRemoveFunctionality(element.closest('tr'));
+        });
+
+    </script>
+</body>
+</html>

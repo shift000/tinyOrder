@@ -15,24 +15,51 @@ def out(msg, title=""):
 # Pfad zur TinyDB-Datenbank
 DB_PATH = 'data/tinydb.json'
 
+def get_db():
+    return TinyDB(DB_PATH)
+
+### ====== INITIALIZE 
 def initialize_db():
     if not os.path.exists('./data'):
         os.mkdir('./data')
     """Initialisiert die TinyDB-Datenbank und erstellt notwendige Tabellen."""
     db = TinyDB(DB_PATH)
-    # Hier werden die Tabellen erstellt, wenn sie nicht existieren
     
-    tables = ['user', 'orders', 'items']
-    # user : uid, name, passwd, rank
-    # orders : oid, f_uid, order, extra, date
-    # items : iid, name
+    tables = ['user', 'orders', 'items', 'daily']
     
     for t in tables:
         db.table(t).all()
         
     initialize_user()
     initialize_items()
+    
     db.close()
+
+    
+def initialize_user():
+    users = {
+        'admin@test.de': {'password': 'admin', 'name': 'Administrator', 'rank': 0},
+        'test@test.de': {'password': 'test', 'name': 'Testuser', 'rank': 2},
+        'zusatz01@test.de': {'password': 'z01', 'name': 'Zusatz01', 'rank': 2},
+        'zusatz02@test.de': {'password': 'z02', 'name': 'Zusatz02', 'rank': 2},
+        'zusatz03@test.de': {'password': 'z03', 'name': 'Zusatz03', 'rank': 2},
+        'zusatz04@test.de': {'password': 'z04', 'name': 'Zusatz04', 'rank': 2},
+        'zusatz05@test.de': {'password': 'z05', 'name': 'Zusatz05', 'rank': 2},
+    }
+    
+    if not get_user_by_email(list(users.keys())[0]):
+        for key, item in users.items():
+            add_user(key, item["name"], hash_password(item["password"]), item["rank"])
+
+def initialize_items():
+    items = ["Brezel", "Vollkornbrötchen", "Laugenecke", "Laugenweck", "Laugenstange", "Spitzweck", "Baguettebrötchen", "Miniwaldi", "Körnerbrötchen", "Kürbiskernbrötchen"]
+    items.sort()
+    
+    for item in items:
+        if not get_item(item):
+            add_item(item)
+ 
+### ====== INITIALIZE 
 
 def add_user(email, name, passwd, rank):
     """Fügt einen neuen Benutzer hinzu."""
@@ -65,6 +92,19 @@ def get_user_by_id(uid):
     
     db.close()
     return user[0] if user else None
+    
+def get_users():
+    """Ruft alle Bestellungen aus der 'orders'-Tabelle ab."""
+    db = TinyDB(DB_PATH)
+    users_table = db.table('user')
+    
+    # Abrufen aller Bestellungen
+    users = users_table.all()
+    
+    #print(users)
+    
+    db.close()
+    return users if users else None
 
 def get_user_by_email(email):
     """Ruft einen Benutzer basierend auf der UID ab."""
@@ -93,7 +133,8 @@ def add_order(f_uid, order, extra):
             'f_uid': f_uid,  # Fremdschlüssel zur Benutzer-ID
             'order': order,
             'extra': extra,
-            'date': datetime.now().strftime('%d.%m.%Y - %H:%M:%S')
+            'date': datetime.now().strftime('%d.%m.%Y'),
+            'stamp': datetime.now().strftime('%H:%M')
         })
         
         db.close()
@@ -295,7 +336,4 @@ def initialize_items():
     for item in items:
         if not get_item(item):
             add_item(item)
-        
-        
-        
-        
+ 

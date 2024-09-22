@@ -136,20 +136,10 @@
         <!-- Page header -->
         <div class="page-header d-print-none">
           <div class="container-xl">
-			{% if config.error %}
-			<div class="col-12">
-				<button class="btn position-relative" style="pointer-events: none;">Information: {{ config.error }}<span class="badge bg-red badge-notification badge-pill">!</span></button>
-			</div><br />
-			{% endif %}
-			{% if config.success %}
-			<div class="col-12">
-				<button class="btn position-relative" style="pointer-events: none;">Information: {{ config.success }}<span class="badge bg-green badge-notification badge-pill">!</span></button>
-			</div><br />
-			{% endif %}
             <div class="row g-2 align-items-center">
               <div class="col">
                 <h2 class="page-title">
-                  {{ config.ix_title }}
+                  Empty page
                 </h2>
               </div>
             </div>
@@ -158,49 +148,7 @@
         <!-- Page body -->
         <div class="page-body">
           <div class="container-xl">
-			<div class="mb-3">
-			  <label class="form-label">{{ config.ix_order_proc_text }}</label>
-              <div class="progress mb-2">
-                <div class="progress-bar" style="width: {{ config.ix_order_proc }}%" role="progressbar" aria-valuenow="{{ config.ix_order_proc }}" aria-valuemin="0" aria-valuemax="100" aria-label="{{ config.ix_order_proc }}% Complete">
-                  <span class="visually-hidden">{{ config.ix_order_proc }}% Complete</span>
-				</div>
-			  </div>
-			</div>
-            <div class="card">
-              <div class="card-body">
-                <div id="table-default" class="table-responsive">
-                  <table class="table">
-                    <thead>
-                      <tr>
-                        <th><button class="table-sort" data-sort="sort-no">ORDER-NO</button></th>
-                        <th><button class="table-sort" data-sort="sort-name">NAME</button></th>
-                        <th><button class="table-sort" data-sort="sort-order">ORDER</button></th>
-                        <th><button class="table-sort" data-sort="sort-extra">EXTRA</button></th>
-                        <th><button class="table-sort" data-sort="sort-time">TIMESTAMP</button></th>
-                      </tr>
-                    </thead>
-                    <tbody class="table-tbody">
-                      {% for order in orders %}
-                      <tr data-id="{{ order.id }}">
-                        <td class="sort-no">{{ order.order_no }}</td>
-                        <td class="sort-name">{{ order.name }}</td>
-                        <td class="sort-order">{{ order.order }}</td>
-                        <td class="sort-extra">{{ order.extra }}</td>
-                        <td class="sort-time">{{ order.timestamp }}</td>
-                        <td><button data-bs-toggle="dropdown" type="button" class="btn dropdown-toggle dropdown-toggle-split btn-square"></button>
-                        <div class="dropdown-menu dropdown-menu-end">
-                            <a class="dropdown-item removeRow" href="#">
-                                {{ config.ix_remove_row }}
-                            </a>
-                        </div>
-                          </td>
-                      </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                </div>
-              </div>      
-            </div>    
+            <!-- Content here -->
           </div>
         </div>
         <footer class="footer footer-transparent d-print-none">
@@ -229,51 +177,5 @@
     <!-- Tabler Core -->
     <script src="{{ url_for('static', filename='js/tabler.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/demo.min.js') }}"></script>
-    <script>
-        // Funktion zum Hinzufügen der Entfernen-Funktionalität
-        function addRemoveFunctionality(row) {
-            row.querySelector('.removeRow').addEventListener('click', function(event) {
-                event.preventDefault(); // Verhindert das Standard-Verhalten des Links
-                const row = this.closest('tr'); // Finde die nächste Tabellenzeile
-                const id = row.dataset.id; // Hole die ID aus dem data-id Attribut
-    
-                if (!id) {
-                    console.error('Keine ID für diese Zeile gefunden.');
-                    return; // Abbrechen, wenn keine ID vorhanden ist
-                }
-
-                // Optional: Senden einer Fetch-Anfrage, um den Server über die Löschung zu informieren
-                fetch('/remove_order', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ id: id }) // Senden der ID zum Entfernen der Zeile
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        row.remove(); // Entferne die Zeile vom DOM
-                    } else {
-                        console.error('Fehler beim Entfernen der Zeile:', data.error);
-
-                        // Wenn kein div mit der Klasse "error" existiert
-                        const errorMessageElement = document.getElementById('error-message');
-
-                        // Überprüfen, ob das Element existiert, bevor der Inhalt gesetzt wird
-                        if (errorMessageElement) {
-                            errorMessageElement.innerHTML = 'Keine Berechtigung Bestellungen zu entfernen';
-                        }
-                    }
-                }).catch(error => console.error('Fetch-Fehler:', error));
-            });
-        }
-
-        // Initiale Entfernen-Funktionalität für bereits vorhandene Zeilen hinzufügen
-        document.querySelectorAll('table .removeRow').forEach(function(element) {
-            addRemoveFunctionality(element.closest('tr'));
-        });
-
-    </script>
   </body>
 </html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>Dashboard</title>
+    <!-- CSS files -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tabler.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tabler-flags.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tabler-payments.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tabler-vendors.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/demo.min.css') }}">
+	</head>
+	<body >
+		<script src="{{ url_for('static', filename='js/demo-theme.min.js') }}"></script>
+		<div class="page">
+		<!-- Navbar -->
+			<header class="navbar navbar-expand-md d-print-none" >
+				<div class="container-xl">
+					<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+					<h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
+						<a href=".">
+							<img src="" width="110" height="32" alt="{{ config.headline }}" class="navbar-brand-image">
+							<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-baguette"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5.628 11.283l5.644 -5.637c2.665 -2.663 5.924 -3.747 8.663 -1.205l.188 .181a2.987 2.987 0 0 1 0 4.228l-11.287 11.274a3 3 0 0 1 -4.089 .135l-.143 -.135c-2.728 -2.724 -1.704 -6.117 1.024 -8.841z" /><path d="M9.5 7.5l1.5 3.5" /><path d="M6.5 10.5l1.5 3.5" /><path d="M12.5 4.5l1.5 3.5" /></svg>
+						</a>
+					</h1>
+					<div class="navbar-nav flex-row order-md-last">
+						<div class="d-none d-md-flex">
+							<a href="?theme=dark" class="nav-link px-0 hide-theme-dark" title="ENABLE_DARK" data-bs-toggle="tooltip" data-bs-placement="bottom">
+								<!-- Download SVG icon from http://tabler-icons.io/i/moon -->
+								<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" /></svg>
+							</a>
+							<a href="?theme=light" class="nav-link px-0 hide-theme-light" title="ENABLE_LIGHT" data-bs-toggle="tooltip"	data-bs-placement="bottom">
+								<!-- Download SVG icon from http://tabler-icons.io/i/sun -->
+								<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7" /></svg>
+							</a>
+							<div class="nav-item dropdown d-none d-md-flex me-3">
+								<a href="#" class="nav-link px-0" data-bs-toggle="dropdown" tabindex="-1" aria-label="SHOW_NOTI">
+									<!-- Download SVG icon from http://tabler-icons.io/i/bell -->
+									<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" /><path d="M9 17v1a3 3 0 0 0 6 0v-1" /></svg>
+									<span class="badge bg-red"></span>
+								</a>
+								<div class="dropdown-menu dropdown-menu-arrow dropdown-menu-end dropdown-menu-card">
+									<div class="card">
+										<div class="card-header">
+											<h3 class="card-title">{{ config.last_updates }}</h3>
+										</div>
+										<div class="list-group list-group-flush list-group-hoverable">
+											{% for new in news %}
+											<div class="list-group-item">
+												<div class="row align-items-center">
+													<div class="col-auto">
+													{% if new.status_bad %}
+														<span class="status-dot status-dot-animated bg-red d-block"></span>
+													{% elif new.status_good %}
+														<span class="status-dot status-dot-animated bg-green d-block"></span>
+													{% else %}
+														<span class="status-dot d-block"></span>
+													{% endif %}
+													</div>
+													<div class="col text-truncate">
+														<a href="#" class="text-body d-block">{{ new.title }}</a>
+														<div class="d-block text-muted text-truncate mt-n1">
+														{{ new.message }}
+														</div>
+													</div>
+													<div class="col-auto">
+														<a href="#" class="list-group-item-actions">
+														<!-- Download SVG icon from http://tabler-icons.io/i/star -->
+															<svg xmlns="http://www.w3.org/2000/svg" class="icon text-muted" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" /></svg>
+														</a>
+													</div>
+												</div>
+											</div>
+											{% endfor %}
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="nav-item dropdown">
+							<a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu">
+								<span class="avatar avatar-sm" style="background-image: url({{ url_for('static', filename='img/026m.jpg') }})"></span>
+								<div class="d-none d-xl-block ps-2">
+									<div>{{ username }}</div>
+									<div class="mt-1 small text-muted">{{ email }}</div>
+								</div>
+							</a>
+							<div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+								<a href="/profile" class="dropdown-item">{{ config.btn_profile }}</a>
+								<a href="/feedback" class="dropdown-item">{{ config.btn_feedback }}</a>
+								<div class="dropdown-divider"></div>
+								<a href="/accounts" class="dropdown-item">{{ config.btn_accounts }}</a>
+								<a href="/logout" class="dropdown-item">{{ config.btn_logout }}</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</header>
+			<header class="navbar-expand-md">
+				<div class="collapse navbar-collapse" id="navbar-menu">
+					<div class="navbar">
+						<div class="container-xl">
+							<ul class="navbar-nav">
+								<li class="nav-item">
+									<a class="nav-link" href="./" >
+										<span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+											<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l-2 0l9 -9l9 9l-2 0" /><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" /><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" /></svg>
+										</span>
+										<span class="nav-link-title">
+											{{ config.link_index }}
+										</span>
+									</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</header>
+			<div class="page-wrapper">
+			<!-- Page header -->
+				<div class="page-header d-print-none">
+					<div class="container-xl">
+						<div class="row g-2 align-items-center">
+							<div class="col">
+								<h2 class="page-title">
+									{{ config.accounts }}
+								</h2>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Page body -->
+				<div class="page-body">
+					<div class="container-xl">
+						<div class="card">
+							<div class="row g-0">
+								<div class="col-3 d-none d-md-block border-end">
+									<div class="card-body">
+										<h4 class="subheader">{{ config.my_title }}</h4>
+										<div class="list-group list-group-transparent">
+											<a href="./accounts.html" class="list-group-item list-group-item-action d-flex align-items-center active">{{ config.my_account }}</a>
+											<a href="my_orders" class="list-group-item list-group-item-action d-flex align-items-center">{{ config.my_orders }}</a>
+											<a href="my_orders" class="list-group-item list-group-item-action d-flex align-items-center">{{ config.my_settings }}</a>
+										</div>
+										<h4 class="subheader mt-4">{{ config.my_experience }}</h4>
+										<div class="list-group list-group-transparent">
+											<a href="{{ url_for('feedback') }}" class="list-group-item list-group-item-action">{{ config.my_feedback }}</a>
+										</div>
+									</div>
+								</div>
+								<div class="col d-flex flex-column">
+									<div class="card-body">
+										<h2 class="mb-4">{{ config.my_account_title }}</h2>
+										<h3 class="card-title">{{ config.profile_details }}</h3>
+										<div class="row align-items-center">
+											<div class="col-auto">
+												<span class="avatar avatar-xl" style="background-image: url({{ url_for('static', filename='img/' + config.my_img) }})"></span>
+											</div>
+
+											<div class="col-auto"><a href="#" class="btn">
+												{{ config.btn_change_avatar }}
+											</a></div>
+											<div class="col-auto"><a href="#" class="btn btn-ghost-danger">
+												{{ config.btn_delete_avatar }}
+											</a></div>
+										</div>
+										<h3 class="card-title mt-4">{{ config.my_pwd }}</h3>
+										<p class="card-subtitle">{{ config.my_pwd_noti }}</p>
+										<div>
+											<a href="change_password" class="btn">
+												{{ config.btn_change_pwd }}
+											</a>
+										</div>
+										<br />
+										<form action="/save_config" method="post">
+											<div class="col-md-5">
+												<label class="form-label">{{ config.my_lang_title }}</label>
+												<select name="lang[]" type="text" class="form-select" id="select-countries" value="">
+													<option value="de" data-custom-properties="&lt;span class=&quot;flag flag-xs flag-country-pl&quot;&gt;&lt;/span&gt;">{{ config.my_lang_de }}</option>
+													<option value="en" data-custom-properties="&lt;span class=&quot;flag flag-xs flag-country-de&quot;&gt;&lt;/span&gt;">{{ config.my_lang_en }}</option>
+												</select>
+											</div>
+											<div class="card-footer bg-transparent mt-auto">
+												<div class="btn-list justify-content-end">
+													<button type="reset" href="{{ url_for('index') }}" class="btn btn-square">
+														{{ config.btn_cancel }}
+													</button>
+													<button type="submit" class="btn btn-primary btn-square">
+														{{ config.btn_submit }}
+													</button>
+												</div>
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+        </div>
+        <footer class="footer footer-transparent d-print-none">
+          <div class="container-xl">
+            <div class="row text-center align-items-center flex-row-reverse">
+              <div class="col-12 col-lg-auto mt-3 mt-lg-0">
+                <ul class="list-inline list-inline-dots mb-0">
+                  <li class="list-inline-item">
+                    {{ config.copy_copy }}
+                    <a href="." class="link-secondary">{{ config.copy_author }}</a>.
+                    All rights reserved.
+                  </li>
+                  <li class="list-inline-item">
+                    <a href="./changelog.html" class="link-secondary" rel="noopener">
+                      {{ config.copy_version }}
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </div>
+    <!-- Libs JS -->
+    <!-- Tabler Core -->
+    <script src="{{ url_for('static', filename='js/tabler.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/demo.min.js') }}"></script>
+  </body>
+</html>
